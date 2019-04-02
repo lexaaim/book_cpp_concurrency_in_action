@@ -2,6 +2,8 @@
 #include <thread>
 #include <chrono>
 
+// see also p057_scoped_guard.cpp
+
 using namespace std;
 
 class thread_guard {
