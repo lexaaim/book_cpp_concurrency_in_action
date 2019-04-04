@@ -31,7 +31,7 @@ T parallel_accumulate(Iterator first, Iterator last, T init) {
     vector<thread> threads(num_threads - 1);
 
     Iterator new_begin = first;
-    for (auto i = 0; i < num_threads - 1; i++) {
+    for (size_t i = 0; i < num_threads - 1; i++) {
         Iterator new_end = new_begin;
         advance(new_end, block_size);
         threads[i] = thread{accumulate_block<Iterator, T>(), new_begin, new_end, ref(results[i])};

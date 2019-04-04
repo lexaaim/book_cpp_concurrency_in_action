@@ -22,7 +22,7 @@ public:
     void lock()     { _mutex.lock(); }
     void unlock()   { _mutex.unlock(); }
     T data() const { return _data; }
-    const LockableNode<T> * const next() const { return _next; }
+    LockableNode<T> * next() const { return _next; }
     LockableNode<T> * & next() { return _next; }
 };
 

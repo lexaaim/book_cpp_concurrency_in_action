@@ -83,11 +83,10 @@ void thread_routine() {
 
     max = distr(gen);
     for (auto i = 0; i < max; i++) {
-        int value = 0u;
         try {
         //    tss.pop(value);
             auto result = tss.pop();
-            value = *result;
+            /* int value = *result; */
         }
         catch (const EmptyStackException &) {
             cout << "Exception was caught" << endl;
@@ -100,7 +99,7 @@ int main() {
     vector<thread> threads;
 
     auto tcount = max(thread::hardware_concurrency() - 1, 2u);
-    for (auto i = 0; i < tcount; ++i) {
+    for (size_t i = 0; i < tcount; ++i) {
         threads.push_back(thread{thread_routine});
     }
 

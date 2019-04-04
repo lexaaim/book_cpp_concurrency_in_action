@@ -62,6 +62,7 @@ void thread_routine2() {
     }
 }
 
+// swap data between different threads
 int main() {
     thread t1{thread_routine1};
     thread t2{thread_routine2};

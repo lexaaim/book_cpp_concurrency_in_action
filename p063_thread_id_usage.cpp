@@ -18,7 +18,7 @@ void thread_func() {
 int main() {
     vector<thread> threads;
 
-    for (auto i = 0; i < thread::hardware_concurrency(); i++) {
+    for (size_t i = 0; i < thread::hardware_concurrency(); i++) {
         threads.push_back(thread{thread_func});
     }
 

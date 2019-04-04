@@ -5,7 +5,7 @@ OBJDIR = obj
 INCLUDEDIRS =
 LIBDIRS =
 LIBS =
-CPPFLAGS = -std=c++17 -pthread
+CPPFLAGS = -std=c++17 -pthread -Wall -pedantic -Wextra -Wconversion -fexceptions
 CFLAGS = -std=c11 -D_GNU_SOURCE
 
 CPPSRCS = $(subst $(SRCDIR)/, , $(wildcard $(SRCDIR)/*.cpp))
