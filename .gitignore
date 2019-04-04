@@ -1,2 +1,6 @@
 tags
 bin/*
+ATM/ATM
+ATM/CMake*
+ATM/Makefile
+ATM/cmake*
