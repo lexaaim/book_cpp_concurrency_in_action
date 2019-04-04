@@ -63,7 +63,7 @@ public:
             }
 
             // we can read the next pointer only when the current node is locked
-            // but in the end we must unlock current node
+            // but after the reading we must unlock this node
             auto itcopy = it;
             it = it->next();
             itcopy->unlock();

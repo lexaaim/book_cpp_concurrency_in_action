@@ -2,6 +2,7 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <chrono>
 
 using namespace std;
 
@@ -19,13 +20,13 @@ public:
         // if lhs == rhs, we lock the same mutex twice and get UB
         if (&lhs == &rhs) return;
 
-        //lock both mutexes in a certain order:
-        lock(lhs._mutex, rhs._mutex);
+        // create unique lock guards (for the case of an exception in swap method) parametrized with
+        // defer_lock (do not acquire ownership of the mutex)
+        unique_lock<mutex> lock_lhs(lhs._mutex, defer_lock);
+        unique_lock<mutex> lock_rhs(rhs._mutex, defer_lock);
 
-        // create lock_guards (for the case of an exception in swap method) parametrized with
-        // adopt_lock (assume the calling thread already has ownership of the mutex)
-        lock_guard<mutex> lock_lhs(lhs._mutex, adopt_lock);
-        lock_guard<mutex> lock_rhs(rhs._mutex, adopt_lock);
+        //lock both mutexes in a certain order:
+        lock(lock_lhs, lock_rhs);
 
         // perform an unsafe operations
         lhs._data.swap(rhs._data);
