@@ -1,4 +1,4 @@
-#include "sender.h"
+#include "messaging_sender.h"
 #include "messages.h"
 #include "bank_machine.h"
 #include "interface_machine.h"
@@ -28,22 +28,22 @@ int main()
         {
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
-            atmqueue.send(digit_pressed(c));
+            atmqueue.send(DigitPressed(c));
             break;
         case 'b':
-            atmqueue.send(balance_pressed());
+            atmqueue.send(BalancePressed());
             break;
         case 'w':
-            atmqueue.send(withdraw_pressed(50));
+            atmqueue.send(WithdrawPressed(50));
             break;
         case 'c':
-            atmqueue.send(cancel_pressed());
+            atmqueue.send(CancelPressed());
             break;
         case 'q':
             quit_pressed = true;
             break;
         case 'i':
-            atmqueue.send(card_inserted("acc1234"));
+            atmqueue.send(CardInserted("acc1234"));
             break;
         }
     }

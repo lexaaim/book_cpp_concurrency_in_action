@@ -1,9 +1,9 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
-#include "message_queue.h"
-#include "sender.h"
-#include "dispatcher.h"
+#include "messaging_queue.h"
+#include "messaging_sender.h"
+#include "messaging_dispatcher.h"
 
 namespace Messaging
 {

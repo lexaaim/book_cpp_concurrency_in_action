@@ -1,7 +1,7 @@
 #ifndef BANK_MACHINE_H
 #define BANK_MACHINE_H
 
-#include "receiver.h"
+#include "messaging_receiver.h"
 
 class BankMachine {
     Messaging::Receiver _incoming;

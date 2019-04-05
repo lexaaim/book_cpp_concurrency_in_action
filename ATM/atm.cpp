@@ -3,162 +3,139 @@
 
 void ATM::process_withdrawal() {
     _incoming.wait()
-        .handle<withdraw_ok>(
-            [&](withdraw_ok const &)
+        .handle<WithdrawOk>(
+            [&](const WithdrawOk &)
             {
-                _interface_hardware.send(
-                    issue_money(_withdrawal_amount));
-                _bank.send(
-                    withdrawal_processed(_account,_withdrawal_amount));
-                _state=&ATM::done_processing;
-            }
-            )
-        .handle<withdraw_denied>(
-            [&](withdraw_denied const &)
+                _interface_hardware.send(IssueMoney(_withdrawal_amount));
+                _bank.send(WithdrawalProcessed(_account, _withdrawal_amount));
+                _state = &ATM::done_processing;
+            })
+        .handle<WithdrawDenied>(
+            [&](const WithdrawDenied &)
             {
-                _interface_hardware.send(display_insufficient_funds());
-                _state=&ATM::done_processing;
-            }
-            )
-        .handle<cancel_pressed>(
-            [&](cancel_pressed const &)
+                _interface_hardware.send(DisplayInsufficientFunds());
+                _state = &ATM::done_processing;
+            })
+        .handle<CancelPressed>(
+            [&](const CancelPressed &)
             {
-                _bank.send(
-                    cancel_withdrawal(_account,_withdrawal_amount));
-                _interface_hardware.send(
-                    display_withdrawal_cancelled());
-                _state=&ATM::done_processing;
-            }
-            );
+                _bank.send(CancelWithdrawal(_account, _withdrawal_amount));
+                _interface_hardware.send(DisplayWithdrawalCancelled());
+                _state = &ATM::done_processing;
+            });
 }
 
 void ATM::process_balance() {
     _incoming.wait()
-        .handle<balance>(
-            [&](balance const& msg)
+        .handle<Balance>(
+            [&](const Balance & msg)
             {
-                _interface_hardware.send(display_balance(msg.amount));
-                _state=&ATM::wait_for_action;
-            }
-            )
-        .handle<cancel_pressed>(
-            [&](cancel_pressed const &)
+                _interface_hardware.send(DisplayBalance(msg.amount));
+                _state = &ATM::wait_for_action;
+            })
+        .handle<CancelPressed>(
+            [&](const CancelPressed &)
             {
-                _state=&ATM::done_processing;
-            }
-            );
+                _state = &ATM::done_processing;
+            });
 }
 
 void ATM::wait_for_action() {
-    _interface_hardware.send(display_withdrawal_options());
+    _interface_hardware.send(DisplayWithdrawalOptions());
     _incoming.wait()
-        .handle<withdraw_pressed>(
-            [&](withdraw_pressed const& msg)
+        .handle<WithdrawPressed>(
+            [&](const WithdrawPressed & msg)
             {
-                _withdrawal_amount=msg.amount;
-                _bank.send(withdraw(_account,msg.amount,_incoming));
-                _state=&ATM::process_withdrawal;
-            }
-            )
-        .handle<balance_pressed>(
-            [&](balance_pressed const &)
+                _withdrawal_amount = msg.amount;
+                _bank.send(Withdraw(_account, msg.amount, _incoming));
+                _state = &ATM::process_withdrawal;
+            })
+        .handle<BalancePressed>(
+            [&](const BalancePressed &)
             {
-                _bank.send(get_balance(_account,_incoming));
-                _state=&ATM::process_balance;
-            }
-            )
-        .handle<cancel_pressed>(
-            [&](cancel_pressed const &)
+                _bank.send(GetBalance(_account, _incoming));
+                _state = &ATM::process_balance;
+            })
+        .handle<CancelPressed>(
+            [&](const CancelPressed &)
             {
-                _state=&ATM::done_processing;
-            }
-            );
+                _state = &ATM::done_processing;
+            });
 }
 
 void ATM::verifying_pin() {
     _incoming.wait()
-        .handle<pin_verified>(
-            [&](pin_verified const &)
+        .handle<PinVerified>(
+            [&](const PinVerified &)
             {
-                _state=&ATM::wait_for_action;
-            }
-            )
-        .handle<pin_incorrect>(
-            [&](pin_incorrect const &)
+                _state = &ATM::wait_for_action;
+            })
+        .handle<PinIncorrect>(
+            [&](const PinIncorrect &)
             {
-                _interface_hardware.send(
-                    display_pin_incorrect_message());
-                _state=&ATM::done_processing;
-            }
-            )
-        .handle<cancel_pressed>(
-            [&](cancel_pressed const &)
+                _interface_hardware.send(DisplayPinIncorrectMessage());
+                _state = &ATM::done_processing;
+            })
+        .handle<CancelPressed>(
+            [&](const CancelPressed &)
             {
-                _state=&ATM::done_processing;
-            }
-            );
+                _state = &ATM::done_processing;
+            });
 }
 
 void ATM::getting_pin() {
     _incoming.wait()
-        .handle<digit_pressed>(
-            [&](digit_pressed const& msg)
+        .handle<DigitPressed>(
+            [&](const DigitPressed & msg)
             {
-                unsigned const pin_length=4;
-                _pin+=msg.digit;
-                if(_pin.length()==pin_length)
-                {
-                    _bank.send(verify_pin(_account,_pin,_incoming));
-                    _state=&ATM::verifying_pin;
+                unsigned const pin_length = 4;
+                _pin += msg.digit;
+
+                if(_pin.length() == pin_length) {
+                    _bank.send(VerifyPin(_account, _pin, _incoming));
+                    _state = &ATM::verifying_pin;
                 }
             }
             )
-        .handle<clear_last_pressed>(
-            [&](clear_last_pressed const &)
+        .handle<ClearLastPressed>(
+            [&](const ClearLastPressed &)
             {
-                if(!_pin.empty())
-                {
+                if(!_pin.empty()) {
                     _pin.pop_back();
                 }
-            }
-            )
-        .handle<cancel_pressed>(
-            [&](cancel_pressed const &)
+            })
+        .handle<CancelPressed>(
+            [&](const CancelPressed &)
             {
-                _state=&ATM::done_processing;
-            }
-            );
+                _state = &ATM::done_processing;
+            });
 }
 
 void ATM::waiting_for_card() {
-    _interface_hardware.send(display_enter_card());
+    _interface_hardware.send(DisplayEnterCard());
     _incoming.wait()
-        .handle<card_inserted>(
-            [&](card_inserted const& msg)
+        .handle<CardInserted>(
+            [&](const CardInserted & msg)
             {
                 _account = msg.account;
                 _pin = "";
-                _interface_hardware.send(display_enter_pin());
-                _state=&ATM::getting_pin;
-            }
-            );
+                _interface_hardware.send(DisplayEnterPin());
+                _state = &ATM::getting_pin;
+            });
 }
 
 void ATM::done_processing() {
-    _interface_hardware.send(eject_card());
+    _interface_hardware.send(EjectCard());
     _state = &ATM::waiting_for_card;
 }
 
 void ATM::run() {
     _state = &ATM::waiting_for_card;
-    try
-    {
-        for(;;)
-        {
+    try {
+        while (true) {
             (this->*_state)();
         }
     }
-    catch(Messaging::CloseQueue const&)
-    {
+    catch(const Messaging::CloseQueue &) {
     }
 }

@@ -1,125 +1,126 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-#include "sender.h"
+#include "messaging_sender.h"
 
-struct withdraw
-{
-    std::string account;
-    unsigned amount;
+struct Withdraw {
+    std::string               account;
+    unsigned                  amount;
     mutable Messaging::Sender atm_queue;
-    withdraw(std::string const& account_,
-             unsigned amount_,
-             Messaging::Sender atm_queue_):
-        account(account_),amount(amount_),
-        atm_queue(atm_queue_)
-    {}
+
+    Withdraw(const std::string & account_, unsigned amount_, Messaging::Sender atm_queue_)
+    : account(account_), amount(amount_), atm_queue(atm_queue_)
+    { }
 };
-struct withdraw_ok
-{};
-struct withdraw_denied
-{};
-struct cancel_withdrawal
-{
+
+struct WithdrawOk { };
+
+struct WithdrawDenied { };
+
+struct CancelWithdrawal {
     std::string account;
-    unsigned amount;
-    cancel_withdrawal(std::string const& account_,
-                      unsigned amount_):
-        account(account_),amount(amount_)
-    {}
+    unsigned    amount;
+
+    CancelWithdrawal(const std::string & account_, unsigned amount_)
+    : account(account_), amount(amount_)
+    { }
 };
-struct withdrawal_processed
-{
+
+struct WithdrawalProcessed {
     std::string account;
-    unsigned amount;
-    withdrawal_processed(std::string const& account_,
-                         unsigned amount_):
-        account(account_),amount(amount_)
-    {}
+    unsigned    amount;
+
+    WithdrawalProcessed(const std::string & account_, unsigned amount_)
+    : account(account_), amount(amount_)
+    { }
 };
-struct card_inserted
-{
+
+struct CardInserted {
     std::string account;
-    explicit card_inserted(std::string const& account_):
-        account(account_)
-    {}
+
+    explicit CardInserted(const std::string & account_)
+    : account(account_)
+    { }
 };
-struct digit_pressed
-{
+
+struct DigitPressed {
     char digit;
-    explicit digit_pressed(char digit_):
-        digit(digit_)
-    {}
+
+    explicit DigitPressed(char digit_) : digit(digit_)
+    { }
 };
-struct clear_last_pressed
-{};
-struct eject_card
-{};
-struct withdraw_pressed
-{
+
+struct ClearLastPressed { };
+
+struct EjectCard { };
+
+struct WithdrawPressed {
     unsigned amount;
-    explicit withdraw_pressed(unsigned amount_):
-        amount(amount_)
-    {}
+
+    explicit WithdrawPressed(unsigned amount_)
+    : amount(amount_)
+    { }
 };
-struct cancel_pressed
-{};
-struct issue_money
-{
+
+struct CancelPressed { };
+
+struct IssueMoney {
     unsigned amount;
-    issue_money(unsigned amount_):
-        amount(amount_)
-    {}
+
+    IssueMoney(unsigned amount_) : amount(amount_)
+    { }
 };
-struct verify_pin
-{
-    std::string account;
-    std::string pin;
+
+struct VerifyPin {
+    std::string               account;
+    std::string               pin;
     mutable Messaging::Sender atm_queue;
-    verify_pin(std::string const& account_,std::string const& pin_,
-               Messaging::Sender atm_queue_):
-        account(account_),pin(pin_),atm_queue(atm_queue_)
-    {}
+
+    VerifyPin(const std::string & account_, const std::string & pin_,
+               Messaging::Sender atm_queue_)
+    : account(account_), pin(pin_), atm_queue(atm_queue_)
+    { }
 };
-struct pin_verified
-{};
-struct pin_incorrect
-{};
-struct display_enter_pin
-{};
-struct display_enter_card
-{};
-struct display_insufficient_funds
-{};
-struct display_withdrawal_cancelled
-{};
-struct display_pin_incorrect_message
-{};
-struct display_withdrawal_options
-{};
-struct get_balance
-{
+
+struct PinVerified { };
+
+struct PinIncorrect { };
+
+struct DisplayEnterPin { };
+
+struct DisplayEnterCard { };
+
+struct DisplayInsufficientFunds { };
+
+struct DisplayWithdrawalCancelled { };
+
+struct DisplayPinIncorrectMessage { };
+
+struct DisplayWithdrawalOptions { };
+
+struct GetBalance {
     std::string account;
     mutable Messaging::Sender atm_queue;
-    get_balance(std::string const& account_,Messaging::Sender atm_queue_):
-        account(account_),atm_queue(atm_queue_)
-    {}
+
+    GetBalance(const std::string & account_, Messaging::Sender atm_queue_)
+    : account(account_), atm_queue(atm_queue_)
+    { }
 };
-struct balance
-{
+
+struct Balance {
     unsigned amount;
-    explicit balance(unsigned amount_):
-        amount(amount_)
-    {}
+
+    explicit Balance(unsigned amount_) : amount(amount_)
+    { }
 };
-struct display_balance
-{
+
+struct DisplayBalance {
     unsigned amount;
-    explicit display_balance(unsigned amount_):
-        amount(amount_)
-    {}
+
+    explicit DisplayBalance(unsigned amount_) : amount(amount_)
+    { }
 };
-struct balance_pressed
-{};
+
+struct BalancePressed { };
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef INTERFACE_MACHINE_H
 #define INTERFACE_MACHINE_H
 
-#include "receiver.h"
-#include "sender.h"
+#include "messaging_receiver.h"
+#include "messaging_sender.h"
 
 class InterfaceMachine {
     Messaging::Receiver _incoming;

@@ -1,7 +1,7 @@
 #ifndef SENDER_H
 #define SENDER_H
 
-#include "message_queue.h"
+#include "messaging_queue.h"
 
 namespace Messaging
 {

@@ -1,12 +1,12 @@
 #ifndef DISPATCHER_H
 #define DISPATCHER_H
 
-#include "message_queue.h"
-#include "template_dispatcher.h"
+#include "messaging_queue.h"
+#include "messaging_template_dispatcher.h"
 
 namespace Messaging
 {
-class CloseQueue{ };
+class CloseQueue { };
 
 class Dispatcher {
     Queue * _queue;
@@ -15,14 +15,11 @@ class Dispatcher {
     Dispatcher(const Dispatcher &) = delete;
     Dispatcher & operator=(const Dispatcher &) = delete;
 
-    template<
-        typename Dispatcher,
-        typename Msg,
-        typename Func>
+    template< typename Dispatcher, typename Msg, typename Func>
     friend class TemplateDispatcher;
 
     void wait_and_dispatch() {
-        for (;;) {
+        while (true) {
             auto msg = _queue->wait_and_pop();
             dispatch(msg);
         }
@@ -34,6 +31,7 @@ class Dispatcher {
         }
         return false;
     }
+
 public:
     Dispatcher(Dispatcher && other)
     : _queue(other._queue), _chained(other._chained) {
@@ -54,7 +52,6 @@ public:
         if (!_chained) {
             wait_and_dispatch();
         }
-
     }
 };
 }

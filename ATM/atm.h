@@ -1,8 +1,8 @@
 #ifndef ATM_H
 #define ATM_H
 
-#include "receiver.h"
-#include "sender.h"
+#include "messaging_receiver.h"
+#include "messaging_sender.h"
 #include <string>
 
 class ATM
@@ -25,14 +25,14 @@ class ATM
     void waiting_for_card();
     void done_processing();
 
-    ATM(ATM const&)=delete;
-    ATM& operator=(ATM const&)=delete;
+    ATM(const ATM &)=delete;
+    ATM & operator=(const ATM &)=delete;
 
 public:
     ATM(Messaging::Sender bank_,
         Messaging::Sender interface_hardware_):
         _bank(bank_),_interface_hardware(interface_hardware_)
-    {}
+    { }
 
     void done() {
         get_sender().send(Messaging::CloseQueue());

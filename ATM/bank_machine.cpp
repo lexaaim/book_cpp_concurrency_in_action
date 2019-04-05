@@ -2,54 +2,37 @@
 #include "messages.h"
 
 void BankMachine::run() {
-    try
-    {
-        for(;;)
-        {
+    try {
+        while (true) {
             _incoming.wait()
-                .handle<verify_pin>(
-                    [&](verify_pin const& msg)
+                .handle<VerifyPin>(
+                    [&](const VerifyPin & msg)
                     {
-                        if(msg.pin=="1937")
-                        {
-                            msg.atm_queue.send(pin_verified());
+                        if(msg.pin == "1937") {
+                            msg.atm_queue.send(PinVerified());
+                        } else {
+                            msg.atm_queue.send(PinIncorrect());
                         }
-                        else
-                        {
-                            msg.atm_queue.send(pin_incorrect());
+                    })
+                .handle<Withdraw>(
+                    [&](const Withdraw & msg)
+                    {
+                        if(_balance >= msg.amount) {
+                            msg.atm_queue.send(WithdrawOk());
+                            _balance -= msg.amount;
+                        } else {
+                            msg.atm_queue.send(WithdrawDenied());
                         }
-                    }
-                    )
-                .handle<withdraw>(
-                    [&](withdraw const& msg)
+                    })
+                .handle<GetBalance>(
+                    [&](const GetBalance & msg)
                     {
-                        if(_balance>=msg.amount)
-                        {
-                            msg.atm_queue.send(withdraw_ok());
-                            _balance-=msg.amount;
-                        }
-                        else
-                        {
-                            msg.atm_queue.send(withdraw_denied());
-                        }
-                    }
-                    )
-                .handle<get_balance>(
-                    [&](get_balance const& msg)
-                    {
-                        msg.atm_queue.send(::balance(_balance));
-                    }
-                    )
-                .handle<withdrawal_processed>(
-                    [&](withdrawal_processed const &)
-                    {
-                    }
-                    )
-                .handle<cancel_withdrawal>(
-                    [&](cancel_withdrawal const &)
-                    {
-                    }
-                    );
+                        msg.atm_queue.send(Balance(_balance));
+                    })
+                .handle<WithdrawalProcessed>(
+                    [&](const WithdrawalProcessed &) { })
+                .handle<CancelWithdrawal>(
+                    [&](const CancelWithdrawal &) { });
         }
     }
     catch(Messaging::CloseQueue const&)

@@ -2,106 +2,75 @@
 #include "messages.h"
 #include <iostream>
 
+using namespace std;
+
 void InterfaceMachine::run() {
-    try
-    {
-        for(;;)
-        {
-            _incoming.wait()
-                .handle<issue_money>(
-                    [&](issue_money const& msg)
+    try {
+        while (true) {
+            _incoming.wait()            // constructs and returns new Dispatcher
+                .handle<IssueMoney>(    // constructs and returns the TemplateDispatcher instance,
+                                        // saves lambda and a pointer to the parent dispatcher
+                    [&](const IssueMoney & msg)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Issuing "
-                                     <<msg.amount<<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_insufficient_funds>(
-                    [&](display_insufficient_funds const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Issuing " << msg.amount << endl;
+                    })
+                .handle<DisplayInsufficientFunds>(
+                    [&](const DisplayInsufficientFunds &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Insufficient funds"<<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_enter_pin>(
-                    [&](display_enter_pin const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Insufficient funds" << endl;
+                    })
+                .handle<DisplayEnterPin>(
+                    [&](const DisplayEnterPin &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout
-                                <<"Please enter your PIN (0-9)"
-                                <<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_enter_card>(
-                    [&](display_enter_card const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Please enter your PIN (0-9)" << endl;
+                    })
+                .handle<DisplayEnterCard>(
+                    [&](const DisplayEnterCard &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Please enter your card (I)"
-                                     <<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_balance>(
-                    [&](display_balance const & msg)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Please enter your card (I)" << endl;
+                    })
+                .handle<DisplayBalance>(
+                    [&](const DisplayBalance & msg)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout
-                                <<"The balance of your account is "
-                                <<msg.amount<<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_withdrawal_options>(
-                    [&](display_withdrawal_options const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "The balance of your account is " << msg.amount << endl;
+                    })
+                .handle<DisplayWithdrawalOptions>(
+                    [&](const DisplayWithdrawalOptions &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Withdraw 50? (w)"<<std::endl;
-                            std::cout<<"Display Balance? (b)"
-                                     <<std::endl;
-                            std::cout<<"Cancel? (c)"<<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_withdrawal_cancelled>(
-                    [&](display_withdrawal_cancelled const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Withdraw 50? (w)" << endl;
+                        cout << "Display Balance? (b)" << endl;
+                        cout << "Cancel? (c)" << endl;
+                    })
+                .handle<DisplayWithdrawalCancelled>(
+                    [&](const DisplayWithdrawalCancelled &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Withdrawal cancelled"
-                                     <<std::endl;
-                        }
-                    }
-                    )
-                .handle<display_pin_incorrect_message>(
-                    [&](display_pin_incorrect_message const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Withdrawal cancelled" << endl;
+                    })
+                .handle<DisplayPinIncorrectMessage>(
+                    [&](const DisplayPinIncorrectMessage &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"PIN incorrect"<<std::endl;
-                        }
-                    }
-                    )
-                .handle<eject_card>(
-                    [&](eject_card const &)
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "PIN incorrect" << endl;
+                    })
+                .handle<EjectCard>(
+                    [&](const EjectCard &)
                     {
-                        {
-                            std::lock_guard<std::mutex> lk(_iomutex);
-                            std::cout<<"Ejecting card"<<std::endl;
-                        }
-                    }
-                    );
+                        lock_guard<mutex> lk(_iomutex);
+                        cout << "Ejecting card" << endl;
+                    });
+
+        // Every of TemplateDispathers are chained, except for last one.
+        // Calls Dispatcher's destructor, where it reads a new message from the queue,
+        // and dispatches it from last to first
         }
     }
-    catch(Messaging::CloseQueue &)
-    {
+    catch(Messaging::CloseQueue &) {
     }
 }
