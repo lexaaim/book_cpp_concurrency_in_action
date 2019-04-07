@@ -26,11 +26,11 @@ void read_y_then_x() {
 }
 
 int main() {
-    x = false;
-    y = false;
-    z = 0;
-
     for (int i = 0; i < 10; i++) {
+        x = false;
+        y = false;
+        z = 0;
+
         thread a{ write_x };
         thread b{ write_y };
         thread c{ read_x_then_y };
